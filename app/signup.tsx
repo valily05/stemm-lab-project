@@ -118,7 +118,7 @@ contentContainerStyle={{
             image={require('../assets/images/Letter.png')}
             placeholder="Enter your email"
           />
-
+          
           {/* PASSWORD */}
           <AuthInput
             label={t.password}
