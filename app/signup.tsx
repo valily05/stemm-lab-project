@@ -117,7 +117,7 @@ export default function RegisterScreen() {
                 isPassword
                 value={password}
                 onChangeText={setPassword}
-                onFocus={() => scrollTo(450)} // ✅ AUTO SCROLL
+                onFocus={() => scrollTo(450)} 
               />
 
               <PasswordChecklist password={password} />
