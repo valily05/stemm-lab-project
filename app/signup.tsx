@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -17,43 +17,31 @@ import {
 } from 'react-native';
 
 import { AuthButton, AuthInput } from '../components/AuthElements';
+import PasswordChecklist from '../components/PasswordChecklist';
+import PasswordStrength from '../components/PasswordStrength';
 import { LAYOUT } from '../constants/layout';
 import { useLanguage } from '../context/LanguageContext';
-
-const getStrength = (password: string) => {
-  let strength = 0;
-  if (password.length >= 8) strength++;
-  if (/[a-z]/.test(password)) strength++;
-  if (/[A-Z]/.test(password)) strength++;
-  if (/[0-9]/.test(password)) strength++;
-  if (/[^A-Za-z0-9]/.test(password)) strength++;
-  return strength;
-};
 
 export default function RegisterScreen() {
   const router = useRouter();
   const FONT = LAYOUT.width * 0.035;
+
+  const scrollRef = useRef<ScrollView>(null); // ✅ NEW
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const shakeAnim = useState(new Animated.Value(0))[0];
 
-  const strength = getStrength(password);
-
   const passwordsMatch =
     password === confirmPassword && confirmPassword.length > 0;
 
-  const getStrengthLabel = () => {
-    switch (strength) {
-      case 0: return "Very Weak";
-      case 1: return "Weak";
-      case 2: return "Okay";
-      case 3: return "Good";
-      case 4: return "Strong";
-      case 5: return "Very Strong";
-      default: return "";
-    }
+  const { language, setLanguage, t } = useLanguage();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // ✅ scroll function
+  const scrollTo = (y: number) => {
+    scrollRef.current?.scrollTo({ y, animated: true });
   };
 
   const triggerShake = () => {
@@ -66,202 +54,155 @@ export default function RegisterScreen() {
     ]).start();
   };
 
-  const { language, setLanguage, t } = useLanguage();
-  const [modalVisible, setModalVisible] = useState(false);
-
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ImageBackground
         source={require('../assets/images/bg2.png')}
-        style={{flex :1}}
+        style={{ flex: 1 }}
       >
-       <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-    >
-       <ScrollView
-contentContainerStyle={{
-  flexGrow: 1,
-  paddingTop: 60,
-  paddingBottom: 40
-}}        keyboardShouldPersistTaps="handled"
-      >
-       {/* Language */}
-        <TouchableOpacity
-          style={styles.langContainer}
-          onPress={() => setModalVisible(true)}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
         >
-          <Image source={require('../assets/images/globe.png')} style={styles.langIcon} />
-          <Text style={[styles.langText, { fontSize: FONT }]}>{language}</Text>
-          <Text style={styles.langArrow}>▼</Text>
-        </TouchableOpacity>
 
-        {/* Logo */}
-        <Image
-          source={require('../assets/images/logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+          {/* ✅ attach ref here */}
+          <ScrollView
+            ref={scrollRef}
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingTop: 60,
+              paddingBottom: 40
+            }}
+            keyboardShouldPersistTaps="handled"
+          >
 
-        {/* Content */}
-        <View style={styles.content}>
-          <Text style={[styles.title, { fontSize: FONT }]}>{t.title}</Text>
+            {/* Language */}
+            <TouchableOpacity
+              style={styles.langContainer}
+              onPress={() => setModalVisible(true)}
+            >
+              <Image source={require('../assets/images/globe.png')} style={styles.langIcon} />
+              <Text style={[styles.langText, { fontSize: FONT }]}>{language}</Text>
+              <Text style={styles.langArrow}>▼</Text>
+            </TouchableOpacity>
 
-          <AuthInput
-            label={t.fullName}
-            image={require('../assets/images/User.png')}
-            placeholder="Enter your full name"
-          />
+            {/* Logo */}
+            <Image
+              source={require('../assets/images/logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
 
-          <AuthInput
-            label={t.email}
-            image={require('../assets/images/Letter.png')}
-            placeholder="Enter your email"
-          />
-          
-          {/* PASSWORD */}
-          <AuthInput
-            label={t.password}
-            image={require('../assets/images/Lock.png')}
-            placeholder="Create a password"
-            isPassword
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-          />
+            {/* Content */}
+            <View style={styles.content}>
+              <Text style={[styles.title, { fontSize: FONT }]}>{t.title}</Text>
 
-          {/* CHECKLIST */}
-          <View style={{ marginTop: 8 }}>
-            {[
-              { label: 'At least 8 characters', valid: password.length >= 8 },
-              { label: 'Lowercase letter', valid: /[a-z]/.test(password) },
-              { label: 'Uppercase letter', valid: /[A-Z]/.test(password) },
-              { label: 'Number', valid: /[0-9]/.test(password) },
-              { label: 'Special character', valid: /[^A-Za-z0-9]/.test(password) },
-            ].map((item, index) => (
-              <Text
-                key={index}
+              <AuthInput
+                label={t.fullName}
+                image={require('../assets/images/User.png')}
+                placeholder="Enter your full name"
+              />
+
+              <AuthInput
+                label={t.email}
+                image={require('../assets/images/Letter.png')}
+                placeholder="Enter your email"
+              />
+
+              {/* PASSWORD */}
+              <AuthInput
+                label={t.password}
+                image={require('../assets/images/Lock.png')}
+                placeholder="Create a password"
+                isPassword
+                value={password}
+                onChangeText={setPassword}
+                onFocus={() => scrollTo(450)} // ✅ AUTO SCROLL
+              />
+
+              <PasswordChecklist password={password} />
+              <PasswordStrength password={password} labelEmpty={t.PS} />
+
+              {/* CONFIRM PASSWORD */}
+              <View
                 style={{
-                  color: item.valid ? '#00cc66' : '#ff4d4d',
-                  fontSize: 12,
-                  marginBottom: 2
+                  borderRadius: 10,
+                  borderWidth: passwordsMatch ? 2 : 0,
+                  borderColor: '#00cc66',
+                  shadowColor: '#00cc66',
+                  shadowOpacity: passwordsMatch ? 0.8 : 0,
+                  shadowRadius: 10,
                 }}
               >
-                {item.valid ? '✔ ' : '✖ '} {item.label}
-              </Text>
-            ))}
-          </View>
-
-          {/* STRENGTH */}
-          <View style={styles.passwordHelperContainer}>
-            <View style={styles.strengthContainer}>
-              <View style={styles.strengthBars}>
-                {[...Array(5)].map((_, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.bar,
-                      index < strength && {
-                        backgroundColor:
-                          strength <= 1 ? '#ff4d4d' :
-                          strength <= 3 ? '#ffaa00' :
-                          '#00cc66'
-                      }
-                    ]}
-                  />
-                ))}
+                <AuthInput
+                  label={t.confirmPassword}
+                  image={require('../assets/images/Lock.png')}
+                  placeholder="Confirm your password"
+                  isPassword
+                  value={confirmPassword}
+                  onChangeText={(text) => {
+                    setConfirmPassword(text);
+                    if (text.length > 0 && text !== password) triggerShake();
+                  }}
+                  onFocus={() => scrollTo(420)} // ✅ AUTO SCROLL
+                />
               </View>
 
-              <View style={styles.strengthLabelContainer}>
-                <Text style={styles.strengthText}>
-                  {password.length === 0 ? t.PS : getStrengthLabel()}
+              {/* MATCH TEXT */}
+              <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
+                {confirmPassword.length > 0 && (
+                  <Text style={{
+                    color: passwordsMatch ? '#00cc66' : '#ff4d4d',
+                    marginTop: 5
+                  }}>
+                    {passwordsMatch
+                      ? 'Passwords match ✓'
+                      : 'Passwords do not match'}
+                  </Text>
+                )}
+              </Animated.View>
+
+              {/* BUTTON */}
+              <AuthButton
+                title={t.register}
+                onPress={() => console.log('Registering...')}
+                disabled={!passwordsMatch || password.length === 0}
+              />
+
+              {/* FOOTER */}
+              <View style={styles.footer}>
+                <Text style={[styles.footerText, { fontSize: FONT * 0.8 }]}>
+                  {t.already}
                 </Text>
-              </View>
-            </View>
-          </View>
 
-          {/* CONFIRM PASSWORD + GLOW */}
-          <View
-            style={{
-              borderRadius: 10,
-              borderWidth: passwordsMatch ? 2 : 0,
-              borderColor: '#00cc66',
-              shadowColor: '#00cc66',
-              shadowOpacity: passwordsMatch ? 0.8 : 0,
-              shadowRadius: 10,
-            }}
-          >
-            <AuthInput
-              label={t.confirmPassword}
-              image={require('../assets/images/Lock.png')}
-              placeholder="Confirm your password"
-              isPassword
-              value={confirmPassword}
-              onChangeText={(text) => {
-                setConfirmPassword(text);
-                if (text.length > 0 && text !== password) triggerShake();
-              }}
-            />
-          </View>
-
-          {/* SHAKE MESSAGE */}
-          <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
-            {confirmPassword.length > 0 && (
-              <Text style={{
-                color: passwordsMatch ? '#00cc66' : '#ff4d4d',
-                marginTop: 5
-              }}>
-                {passwordsMatch
-                  ? 'Passwords match ✓'
-                  : 'Passwords do not match'}
-              </Text>
-            )}
-          </Animated.View>
-
-          {/* BUTTON */}
-          <AuthButton
-            title={t.register}
-            onPress={() => console.log('Registering...')}
-            disabled={!passwordsMatch || password.length === 0}
-          />
-
-          {/* Footer */}
-          <View style={styles.footer}>
-            <Text style={[styles.footerText, { fontSize: FONT * 0.8 }]}>
-              {t.already}
-            </Text>
-
-            <TouchableOpacity onPress={() => router.push('/login')}>
-              <Text style={[styles.loginLink, { fontSize: FONT }]}>
-                {t.login}
-              </Text>
-              <View style={styles.underline} />
-            </TouchableOpacity>
-          </View>
-        </View>
-        
-        {/* Language Modal */}
-        <Modal transparent animationType="fade" visible={modalVisible}>
-          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-                <TouchableOpacity style={styles.option} onPress={() => { setLanguage('English'); setModalVisible(false); }}>
-                  <Text style={styles.optionText}>English</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.option} onPress={() => { setLanguage('Bahasa Indonesia'); setModalVisible(false); }}>
-                  <Text style={styles.optionText}>Bahasa Indonesia</Text>
+                <TouchableOpacity onPress={() => router.push('/login')}>
+                  <Text style={[styles.loginLink, { fontSize: FONT }]}>
+                    {t.login}
+                  </Text>
+                  <View style={styles.underline} />
                 </TouchableOpacity>
               </View>
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
 
-</ScrollView>
-</KeyboardAvoidingView>
+            {/* Modal */}
+            <Modal transparent animationType="fade" visible={modalVisible}>
+              <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+                <View style={styles.modalOverlay}>
+                  <View style={styles.modalContent}>
+                    <TouchableOpacity onPress={() => { setLanguage('English'); setModalVisible(false); }}>
+                      <Text style={styles.optionText}>English</Text>
+                    </TouchableOpacity>
 
+                    <TouchableOpacity onPress={() => { setLanguage('Bahasa Indonesia'); setModalVisible(false); }}>
+                      <Text style={styles.optionText}>Bahasa Indonesia</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </Modal>
 
-     
-
+          </ScrollView>
+        </KeyboardAvoidingView>
       </ImageBackground>
     </TouchableWithoutFeedback>
   );
@@ -376,10 +317,11 @@ logo: {
   },
 
   option: {
-    paddingVertical: 13,
+    paddingVertical: 14,
   },
 
   optionText: {
-    color: 'white',
-  },
+  color: 'white',
+  textAlign: 'center',
+},
 });

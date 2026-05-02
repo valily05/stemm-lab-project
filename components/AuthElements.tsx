@@ -18,6 +18,7 @@ interface AuthInputProps {
   placeholder?: string;
   onChangeText?: (text: string) => void;
   value?: string;
+  onFocus?:() => void;
 }
 
 export const AuthInput: React.FC<AuthInputProps> = ({
