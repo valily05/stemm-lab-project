@@ -37,6 +37,7 @@ export const AUTH_COLORS = {
   inputBorder: '#6568C7',
   buttonPurple: '#722AE4',
   textGray: '#aaa',
+  
 };
 
 export const FACTS = {

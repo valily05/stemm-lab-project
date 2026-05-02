@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { AUTH_COLORS, COLORS, LAYOUT } from '../constants/layout';
+import { COLORS, LAYOUT } from '../constants/layout';
 
 interface AuthInputProps {
   label: string;
@@ -18,7 +18,8 @@ interface AuthInputProps {
   placeholder?: string;
   onChangeText?: (text: string) => void;
   value?: string;
-  onFocus?:() => void;
+  onFocus?: () => void;
+  borderColor?: string;
 }
 
 export const AuthInput: React.FC<AuthInputProps> = ({
@@ -28,16 +29,15 @@ export const AuthInput: React.FC<AuthInputProps> = ({
   isPassword,
   placeholder,
   onChangeText,
-  value
+  value,
+  onFocus,
+  borderColor
 }) => {
   const FONT = LAYOUT.width * 0.035;
-
   const [hidePassword, setHidePassword] = useState(true);
 
   return (
     <View style={styles.inputContainer}>
-      
-      {/* LABEL */}
       <View style={styles.labelRow}>
         <Image source={image} style={styles.icon} />
         <Text style={[styles.labelText, { fontSize: FONT * 0.9 }]}>
@@ -45,30 +45,33 @@ export const AuthInput: React.FC<AuthInputProps> = ({
         </Text>
       </View>
 
-      {/* INPUT + EYE */}
       <View style={styles.inputWrapper}>
-        <TextInput
-          placeholder={placeholder}
-          placeholderTextColor={COLORS.lightPurple}
-          secureTextEntry={isPassword ? hidePassword : secure}
-          style={[
-            styles.inputField,
-            { height: LAYOUT.inputHeight, fontSize: FONT * 1.3 }
-          ]}
-          value={value}
-          onChangeText={onChangeText}
-          autoCorrect={false}
-          autoCapitalize="none"
+      <TextInput
+  placeholder={placeholder}
+  placeholderTextColor={COLORS.lightPurple}
+  secureTextEntry={isPassword ? hidePassword : secure}
+  style={[
+    styles.inputField,
+    {
+      height: LAYOUT.inputHeight,
+      fontSize: FONT * 1.3,
+      borderColor: borderColor || '#8B7CFF'
+    }
+  ]}
+  value={value}
+  onChangeText={onChangeText}
+  onFocus={onFocus}
+  autoCorrect={false}
+  autoCapitalize="none"
+  textContentType="oneTimeCode"
+  autoComplete="off"
+/>
 
-          textContentType="oneTimeCode"
-          autoComplete="off"
-        />
-
-        {/* 👁 PNG TOGGLE */}
         {isPassword && (
           <TouchableOpacity
             style={styles.eyeButton}
             onPress={() => setHidePassword(!hidePassword)}
+            activeOpacity={0.7}
           >
             <Image
               source={
@@ -91,14 +94,15 @@ export const AuthButton: React.FC<{
   disabled?: boolean;
 }> = ({ title, onPress, disabled }) => (
   <TouchableOpacity
-  onPress={onPress}
-  disabled={disabled}
-  style={[
-    styles.button,
-    { height: LAYOUT.inputHeight },
-    disabled && { opacity: 0.5 }
-  ]}
->
+    onPress={onPress}
+    disabled={disabled}
+    activeOpacity={0.7}
+    style={[
+      styles.button,
+      { height: LAYOUT.inputHeight },
+      disabled && styles.buttonDisabled
+    ]}
+  >
     <Text style={[styles.buttonText, { fontSize: LAYOUT.width * 0.035 }]}>
       {title}
     </Text>
@@ -117,8 +121,8 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    width: 30,
-    height: 30,
+    width: 28,
+    height: 28,
     marginRight: 8
   },
 
@@ -133,35 +137,50 @@ const styles = StyleSheet.create({
   },
 
   inputField: {
-    borderWidth: 2,
-    borderColor: AUTH_COLORS.inputBorder,
-    borderRadius: 8,
-    paddingHorizontal: 18,
-    paddingRight: 45, // space for eye icon
-    color: 'white',
-    backgroundColor: AUTH_COLORS.inputBg,
+  borderWidth: 2,
+  borderRadius: 12,
+  paddingHorizontal: 18,
+  paddingRight: 48,
+  color: 'white',
+  backgroundColor: 'rgba(15, 10, 35, 0.95)',
+  fontFamily: 'PixelOperator',
+  letterSpacing: 0.5,
 
-    fontFamily: 'PixelOperator',
-    letterSpacing:0.5,
-  },
+  shadowColor: '#6C63FF',
+  shadowOpacity: 0.8,
+  shadowRadius: 6,
+  shadowOffset: { width: 0, height: 0 },
+  elevation: 6,
+},
 
   eyeButton: {
     position: 'absolute',
-    right: 15
+    right: 14,
+    padding: 8
   },
 
   eyeIcon: {
     width: 22,
     height: 22,
-    tintColor: '#9D61F1' // remove if your PNG already has color
+    tintColor: '#8B7CFF'
   },
 
   button: {
-    marginTop: LAYOUT.height * 0.003,
-    borderRadius: 8,
+    marginTop: LAYOUT.height * 0.01,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: AUTH_COLORS.buttonPurple
+    backgroundColor: '#6C63FF',
+    shadowColor: '#6C63FF',
+    shadowOpacity: 0.7,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 6,
+  },
+
+  buttonDisabled: {
+    opacity: 0.4,
+    backgroundColor: '#3a355f'
   },
 
   buttonText: {

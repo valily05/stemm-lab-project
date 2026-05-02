@@ -26,20 +26,40 @@ export default function RegisterScreen() {
   const router = useRouter();
   const FONT = LAYOUT.width * 0.035;
 
-  const scrollRef = useRef<ScrollView>(null); // ✅ NEW
+  const scrollRef = useRef<ScrollView>(null);
 
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const shakeAnim = useState(new Animated.Value(0))[0];
 
-  const passwordsMatch =
-    password === confirmPassword && confirmPassword.length > 0;
+  const hasTypedConfirm = confirmPassword.length > 0;
+  const isMatch = password === confirmPassword && hasTypedConfirm;
+  const isMismatch = password !== confirmPassword && hasTypedConfirm;
+
+  const borderColor = isMatch
+    ? '#22c55e'
+    : isMismatch
+    ? '#ef4444'
+    : '#8B7CFF';
+
+  const isPasswordValid =
+    password.length >= 8 &&
+    /[a-zA-Z]/.test(password) &&
+    /\d/.test(password);
+
+  const isFormValid =
+    fullName.trim().length > 0 &&
+    email.trim().length > 0 &&
+    isPasswordValid &&
+    confirmPassword.length > 0 &&
+    isMatch;
 
   const { language, setLanguage, t } = useLanguage();
   const [modalVisible, setModalVisible] = useState(false);
 
-  // ✅ scroll function
   const scrollTo = (y: number) => {
     scrollRef.current?.scrollTo({ y, animated: true });
   };
@@ -56,27 +76,17 @@ export default function RegisterScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ImageBackground
-        source={require('../assets/images/bg2.png')}
-        style={{ flex: 1 }}
-      >
+      <ImageBackground source={require('../assets/images/bg2.png')} style={{ flex: 1 }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
         >
-
-          {/* ✅ attach ref here */}
           <ScrollView
             ref={scrollRef}
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingTop: 60,
-              paddingBottom: 40
-            }}
+            contentContainerStyle={{ flexGrow: 1, paddingTop: 60, paddingBottom: 40 }}
             keyboardShouldPersistTaps="handled"
           >
 
-            {/* Language */}
             <TouchableOpacity
               style={styles.langContainer}
               onPress={() => setModalVisible(true)}
@@ -86,30 +96,30 @@ export default function RegisterScreen() {
               <Text style={styles.langArrow}>▼</Text>
             </TouchableOpacity>
 
-            {/* Logo */}
             <Image
               source={require('../assets/images/logo.png')}
               style={styles.logo}
               resizeMode="contain"
             />
 
-            {/* Content */}
             <View style={styles.content}>
-              <Text style={[styles.title, { fontSize: FONT }]}>{t.title}</Text>
 
               <AuthInput
                 label={t.fullName}
                 image={require('../assets/images/User.png')}
                 placeholder="Enter your full name"
+                value={fullName}
+                onChangeText={setFullName}
               />
 
               <AuthInput
                 label={t.email}
                 image={require('../assets/images/Letter.png')}
                 placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
               />
 
-              {/* PASSWORD */}
               <AuthInput
                 label={t.password}
                 image={require('../assets/images/Lock.png')}
@@ -117,59 +127,50 @@ export default function RegisterScreen() {
                 isPassword
                 value={password}
                 onChangeText={setPassword}
-                onFocus={() => scrollTo(450)} 
+                onFocus={() => scrollTo(450)}
+                borderColor={borderColor}
               />
 
               <PasswordChecklist password={password} />
               <PasswordStrength password={password} labelEmpty={t.PS} />
 
-              {/* CONFIRM PASSWORD */}
-              <View
-                style={{
-                  borderRadius: 10,
-                  borderWidth: passwordsMatch ? 2 : 0,
-                  borderColor: '#00cc66',
-                  shadowColor: '#00cc66',
-                  shadowOpacity: passwordsMatch ? 0.8 : 0,
-                  shadowRadius: 10,
+              <AuthInput
+                label={t.confirmPassword}
+                image={require('../assets/images/Lock.png')}
+                placeholder="Confirm your password"
+                isPassword
+                value={confirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                  if (text.length > 0 && text !== password) triggerShake();
                 }}
-              >
-                <AuthInput
-                  label={t.confirmPassword}
-                  image={require('../assets/images/Lock.png')}
-                  placeholder="Confirm your password"
-                  isPassword
-                  value={confirmPassword}
-                  onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    if (text.length > 0 && text !== password) triggerShake();
-                  }}
-                  onFocus={() => scrollTo(420)} // ✅ AUTO SCROLL
-                />
-              </View>
+                onFocus={() => scrollTo(420)}
+                borderColor={borderColor}
+              />
+<Animated.View
+  style={{
+    transform: [{ translateX: shakeAnim }],
+    marginTop: 6,
+    marginLeft: 4,
+    opacity: confirmPassword.length > 0 ? 0.9 : 0
+  }}
+>
+  <Text
+    style={{
+      fontFamily: 'Pixel',
+      fontSize: 11,
+      color: isMatch ? '#22c55e' : '#ef4444',
+    }}
+  >
+{isMatch ? '✓ Passwords match' : '✕ Passwords do not match'}  </Text>
+</Animated.View>
 
-              {/* MATCH TEXT */}
-              <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
-                {confirmPassword.length > 0 && (
-                  <Text style={{
-                    color: passwordsMatch ? '#00cc66' : '#ff4d4d',
-                    marginTop: 5
-                  }}>
-                    {passwordsMatch
-                      ? 'Passwords match ✓'
-                      : 'Passwords do not match'}
-                  </Text>
-                )}
-              </Animated.View>
-
-              {/* BUTTON */}
               <AuthButton
                 title={t.register}
                 onPress={() => console.log('Registering...')}
-                disabled={!passwordsMatch || password.length === 0}
+                disabled={!isFormValid}
               />
 
-              {/* FOOTER */}
               <View style={styles.footer}>
                 <Text style={[styles.footerText, { fontSize: FONT * 0.8 }]}>
                   {t.already}
@@ -184,7 +185,6 @@ export default function RegisterScreen() {
               </View>
             </View>
 
-            {/* Modal */}
             <Modal transparent animationType="fade" visible={modalVisible}>
               <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
                 <View style={styles.modalOverlay}>
@@ -209,56 +209,15 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-logo: {
-  width: LAYOUT.width * 0.8,
-  height: 120,
-  alignSelf: 'center',
-  marginBottom: 20,
-},
+  logo: {
+    width: LAYOUT.width * 0.9,
+    height: 120,
+    alignSelf: 'center',
+    marginTop: LAYOUT.height * 0.03,
+  },
 
   content: {
     paddingHorizontal: LAYOUT.paddingHorizontal,
-  },
-
-  title: {
-    fontFamily: 'Pixel',
-    color: 'white',
-    marginBottom: LAYOUT.height * 0.015,
-  },
-
-  passwordHelperContainer: {
-    marginBottom: LAYOUT.height * 0.01,
-  },
-
-  strengthContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  strengthBars: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-
-  bar: {
-    width: 35,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#1A1B30',
-  },
-
-  strengthLabelContainer: {
-    backgroundColor: '#070418',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-  },
-
-  strengthText: {
-    color: '#9D61F1',
-    fontSize: 14,
   },
 
   footer: {
@@ -269,10 +228,12 @@ logo: {
   footerText: {
     color: 'white',
     marginBottom: 18,
+    fontFamily: 'Pixel',
   },
 
   loginLink: {
     color: 'yellow',
+    fontFamily: 'Pixel',
   },
 
   underline: {
@@ -284,9 +245,19 @@ logo: {
   langContainer: {
     position: 'absolute',
     top: LAYOUT.height * 0.08,
-    right: 20,
+    right: LAYOUT.width * 0.05,
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#899AF7',
+    shadowColor: '#899AF7',
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 5,
   },
 
   langIcon: {
@@ -316,12 +287,29 @@ logo: {
     padding: 25,
   },
 
-  option: {
-    paddingVertical: 14,
-  },
-
   optionText: {
-  color: 'white',
-  textAlign: 'center',
+    color: 'white',
+    textAlign: 'center',
+    padding: 15,
+    fontFamily: 'Wix',
+  },
+  matchContainer: {
+  alignSelf: 'center',
+  marginTop: 12,
+  marginBottom: 8,
+
+  paddingHorizontal: 14,
+  paddingVertical: 6,
+
+  borderRadius: 20,
+  backgroundColor: 'rgba(0,0,0,0.4)',
+
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.1)',
+},
+
+matchText: {
+  fontFamily: 'Wix',
+  fontSize: 12,
 },
 });

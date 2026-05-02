@@ -12,7 +12,7 @@ export default function PasswordChecklist({ password }: { password: string }) {
   ];
 
   return (
-    <View style={{ marginTop: 8 }}>
+    <View style={{ marginTop: -3 }}>
       {rules.map((item, index) => (
         <View
           key={index}
@@ -20,9 +20,9 @@ export default function PasswordChecklist({ password }: { password: string }) {
         >
           <Ionicons
             name={item.valid ? 'checkmark' : 'close'}
-            size={18}
+            size={16}
             color={item.valid ? '#22c55e' : '#9ca3af'}
-            style={{ marginRight: 6 }}
+            style={{ marginRight: 7 }}
           />
 
           <Text
