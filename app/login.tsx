@@ -162,9 +162,14 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
               />
 
-              <TouchableOpacity>
-                <Text style={styles.forgot}>FORGOT PASSWORD?</Text>
-              </TouchableOpacity>
+            <TouchableOpacity>
+<View style={{ alignSelf: 'flex-start' }}>
+  <View style={{ alignSelf: 'flex-start' }}>
+    <Text style={styles.forgot}>FORGOT PASSWORD?</Text>
+    <View style={styles.forgotUnderline} />
+  </View>
+</View>
+</TouchableOpacity>
 
               <AuthButton title="LOGIN" onPress={()=>{}}/>
 
@@ -183,8 +188,11 @@ export default function LoginScreen() {
               <View style={styles.footer}>
                 <Text style={styles.footerText}>Don't have an account?</Text>
                 <TouchableOpacity onPress={()=>router.push('/signup')}>
-                  <Text style={styles.register}>REGISTER NOW →</Text>
-                </TouchableOpacity>
+  <View style={{ alignItems: 'center' }}>
+    <Text style={styles.register}>REGISTER NOW →</Text>
+    <View style={styles.registerUnderline} />
+  </View>
+</TouchableOpacity>
               </View>
 
               <TouchableOpacity style={styles.teacher}>
@@ -212,7 +220,27 @@ logo:{
 },  content:{paddingHorizontal:20},
   title:{color:'white',textAlign:'center',fontFamily:'Pixel',fontSize:18},
   subtitle:{color:'#FACC15',textAlign:'center',marginBottom:20,fontFamily:'Pixel',fontSize:11,marginTop:13,},
-  forgot:{color:'#60A5FA',marginBottom:20},
+forgot:{
+  color:'#60A5FA',
+  marginBottom:20,
+  fontFamily:'Pixel',
+  fontSize:9,
+},
+forgotUnderline: {
+  height: 2,
+  backgroundColor: '#60A5FA',
+  marginTop: 2,
+  opacity: 1,
+  width: '100%',
+  alignSelf: 'flex-start', 
+},
+registerUnderline: {
+  height: 2,
+  backgroundColor: '#FACC15', 
+  width: '100%',
+  marginTop: 3,
+  opacity: 1,
+},
 or:{
   color:'white',
   textAlign:'center',
@@ -221,8 +249,11 @@ or:{
   
 },  footer:{alignItems:'center',marginTop:20},
   footerText:{color:'white',fontFamily:'Pixel'},
-  register:{color:'yellow',marginTop:5,fontFamily:'Pixel'},
-  teacher:{marginTop:30,padding:15,borderWidth:1,borderColor:'#8B7CFF',borderRadius:20,alignItems:'center',fontFamily:'Pixel'},
+register:{
+  color:'yellow',
+  marginTop:5,
+  fontFamily:'Pixel',
+},  teacher:{marginTop:30,padding:15,borderWidth:1,borderColor:'#8B7CFF',borderRadius:20,alignItems:'center',fontFamily:'Pixel'},
 
   langContainer:{
     position:'absolute',top:60,right:20,flexDirection:'row',
