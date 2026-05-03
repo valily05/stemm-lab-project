@@ -161,16 +161,14 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
               />
-
-            <TouchableOpacity>
-<View style={{ alignSelf: 'flex-start' }}>
-  <View style={{ alignSelf: 'flex-start' }}>
+   {/* 🔵 Forgot + Line */}
+              <View style={styles.forgotContainer}>
+  <TouchableOpacity>
     <Text style={styles.forgot}>FORGOT PASSWORD?</Text>
-    <View style={styles.forgotUnderline} />
-  </View>
-</View>
-</TouchableOpacity>
+  </TouchableOpacity>
 
+  <View style={styles.topLine} />
+</View>
               <AuthButton title="LOGIN" onPress={()=>{}}/>
 
               <Text style={styles.or}>OR</Text>
@@ -220,26 +218,38 @@ logo:{
 },  content:{paddingHorizontal:20},
   title:{color:'white',textAlign:'center',fontFamily:'Pixel',fontSize:18},
   subtitle:{color:'#FACC15',textAlign:'center',marginBottom:20,fontFamily:'Pixel',fontSize:11,marginTop:13,},
+/* 🔵 FORGOT */
+forgotContainer:{
+  alignSelf:'flex-start',
+  marginBottom:15,
+    backgroundColor:'rgba(0,0,0,0.9)',
+
+},
+
 forgot:{
   color:'#60A5FA',
-  marginBottom:20,
   fontFamily:'Pixel',
-  fontSize:9,
+  fontSize:10,
 },
-forgotUnderline: {
-  height: 2,
-  backgroundColor: '#60A5FA',
-  marginTop: 2,
-  opacity: 1,
-  width: '100%',
-  alignSelf: 'flex-start', 
-},
+
 registerUnderline: {
   height: 2,
   backgroundColor: '#FACC15', 
   width: '100%',
   marginTop: 3,
   opacity: 1,
+},
+
+topLine:{
+  width:160,
+  height:2,
+  backgroundColor:'#60A5FA',
+  marginTop:6,
+  borderRadius:2,
+
+  shadowColor:'#60A5FA',
+  shadowOpacity:0.8,
+  shadowRadius:6,
 },
 or:{
   color:'white',
