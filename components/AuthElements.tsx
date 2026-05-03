@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    marginTop: LAYOUT.height * 0.01,
+    marginTop: LAYOUT.height * 0.001,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

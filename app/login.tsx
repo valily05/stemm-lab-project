@@ -1,172 +1,266 @@
-import { Dimensions, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
+import {
+  Animated,
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
+} from 'react-native';
+
+import { AuthButton, AuthInput } from '../components/AuthElements';
+import { LAYOUT } from '../constants/layout';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LoginScreen() {
-  const { width, height } = Dimensions.get('window');
+  const router = useRouter();
+  const FONT = LAYOUT.width * 0.035;
 
-  const FONT = width * 0.035;
-  const INPUT_HEIGHT = height * 0.06;
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const { language, setLanguage, t } = useLanguage();
+
+  // ⭐ SAME STAR SYSTEM (copied from your register)
+  const STAR_COLORS = ['#ffffff','#60A5FA','#FACC15','#FB923C'];
+  const SPECIAL_COLORS = ['#C084FC','#F472B6','#A78BFA'];
+
+  const staticStars = useRef(
+    Array.from({ length: 30 }).map(() => {
+      const isSpecial = Math.random() > 0.6;
+      return {
+        x: Math.random() * LAYOUT.width,
+        y: Math.random() * LAYOUT.height,
+        size: isSpecial ? Math.random() * 3 + 2.5 : Math.random() * 2 + 1.5,
+        opacity: isSpecial ? 1 : Math.random() * 0.8 + 0.3,
+        color: isSpecial
+          ? SPECIAL_COLORS[Math.floor(Math.random()*SPECIAL_COLORS.length)]
+          : STAR_COLORS[Math.floor(Math.random()*STAR_COLORS.length)],
+        isSparkle: Math.random() > 0.7,
+      };
+    })
+  ).current;
+
+  const stars = useRef(
+    Array.from({ length: 80 }).map(() => ({
+      x: Math.random() * LAYOUT.width,
+      y: Math.random() * LAYOUT.height,
+      size: Math.random() * 1.5 + 0.5,
+      opacity: new Animated.Value(Math.random()),
+    }))
+  ).current;
+
+  React.useEffect(() => {
+    stars.forEach((star) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(star.opacity, {
+            toValue: 0.7,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(star.opacity, {
+            toValue: 0.3,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    });
+  }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'black' }}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={{ flex: 1, backgroundColor: '#020617' }}>
 
-      {/* Background */}
-      <Image
-        source={require('@/assets/images/bg2.png')}
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-        }}
-        resizeMode="cover"
-      />
+        {/* ⭐ BACKGROUND */}
+        <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
 
-
-
-      {/* 🧪 Logo */}
-      <Image 
-        source={require('../assets/images/logo.png')}
-        style={{
-          position:'absolute',
-          bottom: height * 0.68,
-          width: width * 0.86,
-          height: height * 0.4,
-          alignSelf: 'center',
-          zIndex: 10,
-        }}
-        resizeMode="contain"
-      />
-
-      <View style={{
-        flex: 1,
-        paddingHorizontal: width * 0.08,
-        paddingTop: height * 0.19
-      }}>
-
-        {/* TITLE */}
-        <Text style={{
-          fontFamily: 'Pixel',
-          fontSize: FONT,
-          color: 'white',
-          marginBottom: height * 0.03
-        }}>
-          CREATE ACCOUNT
-        </Text>
-
-        {/* 🔤 INPUT FIELDS */}
-        {[
-          { label: 'FULL NAME', icon: require('@/assets/images/User.png') },
-          { label: 'EMAIL', icon: require('@/assets/images/Letter.png') },
-          { label: 'PASSWORD', icon: require('@/assets/images/Lock.png'), secure: true },
-          { label: 'CONFIRM PASSWORD', icon: require('@/assets/images/Lock.png'), secure: true },
-        ].map((item, index) => (
-          <View key={index} style={{ marginBottom: height * 0.02 }}>
-
-            {/* 🔥 LABEL + ICON */}
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 6
+          {staticStars.map((star, i) => (
+            <View key={i} style={{
+              position:'absolute',
+              left:star.x,
+              top:star.y,
+              width:star.size,
+              height:star.size,
+              alignItems:'center',
+              justifyContent:'center',
+              opacity:star.opacity
             }}>
-              {typeof item.icon === 'string' ? (
-                <Text style={{
-                  fontSize: 18,
-                  marginRight: 8
-                }}>
-                  {item.icon}
-                </Text>
+              {star.isSparkle ? (
+                <>
+                  <View style={{width:2,height:star.size*2,backgroundColor:star.color}}/>
+                  <View style={{width:star.size*2,height:2,backgroundColor:star.color}}/>
+                </>
               ) : (
-                <Image
-                  source={item.icon}
-                  style={{
-                    width: 21,
-                    height: 21,
-                    marginRight: 8,
-                    tintColor: 'white'
-                  }}
-                />
+                <View style={{
+                  width:star.size,
+                  height:star.size,
+                  borderRadius:50,
+                  backgroundColor:star.color
+                }}/>
               )}
-
-              <Text style={{
-                fontFamily: 'Pixel',
-                color: 'white',
-                fontSize: FONT * 0.9,
-              }}>
-                {item.label}
-              </Text>
             </View>
+          ))}
 
-            {/* INPUT BOX */}
-            <TextInput
-              placeholderTextColor="#aaa"
-              secureTextEntry={item.secure}
-              style={{
-                height: INPUT_HEIGHT,
-                borderWidth: 2,
-                borderColor: '#4a6fa5',
-                borderRadius: 6,
-                paddingHorizontal: 12,
-                color: 'white',
-                backgroundColor: '#0b1f3a',
-                fontFamily: 'Pixel',
-                fontSize: FONT * 0.9,
-              }}
-            />
-
-          </View>
-        ))}
-
-        {/* 🎮 REGISTER BUTTON */}
-        <TouchableOpacity style={{
-          marginTop: height * 0.02,
-          height: INPUT_HEIGHT,
-          borderRadius: 8,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: '#a855f7'
-        }}>
-          <Text style={{
-            fontFamily: 'Pixel',
-            fontSize: FONT,
-            color: 'white'
-          }}>
-            REGISTER
-          </Text>
-        </TouchableOpacity>
-
-        {/* 🔗 LOGIN LINK */}
-        <View style={{
-          marginTop: height * 0.03,
-          alignItems: 'center'
-        }}>
-          <Text style={{
-            fontFamily: 'Pixel',
-            color: 'white',
-            fontSize: FONT * 0.8,
-            marginBottom: 18
-          }}>
-            Already have an account?
-          </Text>
-
-          <Text style={{
-            fontFamily: 'Pixel',
-            color: 'yellow',
-            fontSize: FONT,
-          }}>
-            LOGIN HERE →
-          </Text>
-
-
+          {stars.map((star,i)=>(
+            <Animated.View key={i} style={{
+              position:'absolute',
+              left:star.x,
+              top:star.y,
+              width:star.size,
+              height:star.size,
+              borderRadius:50,
+              backgroundColor:'#fff',
+              opacity:star.opacity
+            }}/>
+          ))}
 
         </View>
-  <View style={{
-    height: 3, // 🔥 thickness here
-    backgroundColor: 'yellow',
-    width: '50%',
-    marginTop: 3,
-    marginLeft:80,
-  }} />
+
+        {/* UI */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
+          <ScrollView contentContainerStyle={{ paddingTop:60,paddingBottom:40 }}>
+
+            {/* 🌐 Language */}
+            <TouchableOpacity style={styles.langContainer}>
+              <Image source={require('../assets/images/globe.png')} style={styles.langIcon}/>
+              <Text style={styles.langText}>{language}</Text>
+            </TouchableOpacity>
+
+            {/* 🎮 Logo */}
+            <Image source={require('../assets/images/logo.png')} style={styles.logo}/>
+
+            <Text style={styles.title}>WELCOME BACK !</Text>
+            <Text style={styles.subtitle}>LOGIN TO CONTINUE YOUR MISSION</Text>
+
+            <View style={styles.content}>
+
+              <AuthInput
+                label="EMAIL ADDRESS"
+                image={require('../assets/images/Letter.png')}
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+              />
+
+              <AuthInput
+                label="PASSWORD"
+                image={require('../assets/images/Lock.png')}
+                placeholder="Enter your password"
+                isPassword
+                value={password}
+                onChangeText={setPassword}
+              />
+
+              <TouchableOpacity>
+                <Text style={styles.forgot}>FORGOT PASSWORD?</Text>
+              </TouchableOpacity>
+
+              <AuthButton title="LOGIN" onPress={()=>{}}/>
+
+              <Text style={styles.or}>OR</Text>
+
+<TouchableOpacity style={styles.googleBtn} activeOpacity={0.8}>
+    <View style={styles.googleContent}>
+    <Image
+      source={require('../assets/images/google.png')}
+      style={styles.googleIcon}
+    />
+    <Text style={styles.googleText}>Login with Google</Text>
+  </View>
+</TouchableOpacity>
+
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>Don't have an account?</Text>
+                <TouchableOpacity onPress={()=>router.push('/signup')}>
+                  <Text style={styles.register}>REGISTER NOW →</Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity style={styles.teacher}>
+                <Text style={{color:'white'}}>TEACHER / ADMIN LOGIN</Text>
+              </TouchableOpacity>
+
+            </View>
+
+          </ScrollView>
+        </KeyboardAvoidingView>
 
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
+
+const styles = StyleSheet.create({
+logo:{
+  width: LAYOUT.width * 0.95,
+  height: 100,
+  alignSelf: 'center',
+  resizeMode: 'contain',
+  marginBottom: 8,
+  marginTop:20,
+},  content:{paddingHorizontal:20},
+  title:{color:'white',textAlign:'center',fontFamily:'Pixel',fontSize:18},
+  subtitle:{color:'#FACC15',textAlign:'center',marginBottom:20,fontFamily:'Pixel',fontSize:11,marginTop:13,},
+  forgot:{color:'#60A5FA',marginBottom:20},
+or:{
+  color:'white',
+  textAlign:'center',
+  marginTop: 18,
+  marginBottom: 8,
+  
+},  footer:{alignItems:'center',marginTop:20},
+  footerText:{color:'white',fontFamily:'Pixel'},
+  register:{color:'yellow',marginTop:5,fontFamily:'Pixel'},
+  teacher:{marginTop:30,padding:15,borderWidth:1,borderColor:'#8B7CFF',borderRadius:20,alignItems:'center',fontFamily:'Pixel'},
+
+  langContainer:{
+    position:'absolute',top:60,right:20,flexDirection:'row',
+    backgroundColor:'rgba(0,0,0,0.9)',padding:8,borderRadius:20
+  },
+  langIcon:{width:18,height:18,marginRight:6},
+  langText:{color:'#E6E6FA'},
+googleBtn: {
+  marginTop: 15,
+  borderRadius: 30,
+  paddingVertical: 16,
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  backgroundColor: 'rgba(255,255,255,0.12)', // ⭐ glass
+  borderWidth: 1.2,
+  borderColor: 'rgba(255,255,255,0.25)',
+
+  shadowColor: '#fff',
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+},
+
+googleContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+googleIcon: {
+  width: 20,
+  height: 20,
+  marginRight: 12, // better spacing from text
+},
+
+googleText: {
+  color: '#ffffff', 
+  fontSize: 15,
+  letterSpacing: 0.5,
+},
+});
