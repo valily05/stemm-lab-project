@@ -25,9 +25,8 @@ import { useLanguage } from '../context/LanguageContext';
 export default function RegisterScreen() {
   const router = useRouter();
   const FONT = LAYOUT.width * 0.035;
-
   const scrollRef = useRef<ScrollView>(null);
-
+const confirmY = useRef(0);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -134,19 +133,25 @@ export default function RegisterScreen() {
               <PasswordChecklist password={password} />
               <PasswordStrength password={password} labelEmpty={t.PS} />
 
-              <AuthInput
-                label={t.confirmPassword}
-                image={require('../assets/images/Lock.png')}
-                placeholder="Confirm your password"
-                isPassword
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (text.length > 0 && text !== password) triggerShake();
-                }}
-                onFocus={() => scrollTo(420)}
-                borderColor={borderColor}
-              />
+            <View
+  onLayout={(event) => {
+    confirmY.current = event.nativeEvent.layout.y;
+  }}
+>
+  <AuthInput
+    label={t.confirmPassword}
+    image={require('../assets/images/Lock.png')}
+    placeholder="Confirm your password"
+    isPassword
+    value={confirmPassword}
+    onChangeText={(text) => {
+      setConfirmPassword(text);
+      if (text.length > 0 && text !== password) triggerShake();
+    }}
+    onFocus={() => scrollTo(confirmY.current - 110)}
+    borderColor={borderColor}
+  />
+</View>
 <Animated.View
   style={{
     transform: [{ translateX: shakeAnim }],
@@ -157,19 +162,26 @@ export default function RegisterScreen() {
 >
   <Text
     style={{
-      fontFamily: 'Pixel',
-      fontSize: 11,
+      fontFamily: 'BebasNeue',
+      fontSize: 14,
       color: isMatch ? '#22c55e' : '#ef4444',
-    }}
+      top:-13,
+      backgroundColor: 'rgba(0,0,0,0.9)',    }}
   >
 {isMatch ? '✓ Passwords match' : '✕ Passwords do not match'}  </Text>
 </Animated.View>
 
-              <AuthButton
-                title={t.register}
-                onPress={() => console.log('Registering...')}
-                disabled={!isFormValid}
-              />
+            <AuthButton
+  title={t.register}
+  onPress={() => {
+    if (!isFormValid) return;
+
+    console.log('Registering...');
+
+    router.replace('/homescreen'); 
+  }}
+  disabled={!isFormValid}
+/>
 
               <View style={styles.footer}>
                 <Text style={[styles.footerText, { fontSize: FONT * 0.8 }]}>

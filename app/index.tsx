@@ -17,6 +17,7 @@ export default function LoadingScreen() {
     Pixel: require('../assets/fonts/PublicPixel.ttf'),
     Wix: require('../assets/fonts/WixMadeforText-Bold.ttf'),
     PixelOperator: require('../assets/fonts/PixelOperator.ttf'),
+    BebasNeue: require('../assets/fonts/BebasNeue-Regular.ttf'),
   });
 
   useEffect(() => {
