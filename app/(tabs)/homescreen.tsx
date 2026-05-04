@@ -100,7 +100,6 @@ const activities = [
           ))}
         </View>
 
-        {/* CTA (PASTEL YELLOW) */}
         <View style={styles.cta}>
           <Image source={require('../../assets/images/trophy.png')} style={styles.ctaIcon} />
           <View>
