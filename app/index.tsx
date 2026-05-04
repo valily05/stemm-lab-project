@@ -18,6 +18,9 @@ export default function LoadingScreen() {
     Wix: require('../assets/fonts/WixMadeforText-Bold.ttf'),
     PixelOperator: require('../assets/fonts/PixelOperator.ttf'),
     BebasNeue: require('../assets/fonts/BebasNeue-Regular.ttf'),
+    PixelIntv: require('../assets/fonts/Pixel Intv.otf'),
+    LEMONMILK :require('../assets/fonts/LEMONMILK-Medium.otf'),
+
   });
 
   useEffect(() => {

@@ -22,6 +22,10 @@ export default function RootLayout() {
         <Stack.Screen name="signup" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ title: 'Modal' }} />
+        <Stack.Screen name="language" options={{ headerShown: false }} />
+        <Stack.Screen name="homescreen" options={{ headerShown: false }} />
+
+
       </Stack>
       <StatusBar style="auto" />
 

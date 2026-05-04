@@ -1,3 +1,4 @@
+import { Filter } from 'bad-words';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
@@ -13,7 +14,6 @@ import {
   TouchableWithoutFeedback,
   View
 } from 'react-native';
-
 import { AuthButton, AuthInput } from '../components/AuthElements';
 import PasswordChecklist from '../components/PasswordChecklist';
 import PasswordStrength from '../components/PasswordStrength';
@@ -26,11 +26,75 @@ export default function RegisterScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const confirmRef = useRef(null);
 
+  // ✅ STATES (must come BEFORE logic)
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // ✅ NEW: common password list
+  const commonPasswords = ['123456', 'password', 'qwerty', '111111', 'abc123', 'letmein'];
+  const isCommonPassword = commonPasswords.includes(password.toLowerCase());
+
+const filter = React.useMemo(() => new Filter(), []);
+
+const normalizePassword = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[@4]/g, 'a')
+    .replace(/[0]/g, 'o')
+    .replace(/[1!]/g, 'i')
+    .replace(/[3]/g, 'e')
+    .replace(/[5]/g, 's')
+    .replace(/[7]/g, 't')
+    .replace(/[^a-z]/g, '');
+};
+const checkOffensive = (text: string) => {
+  const cleaned = normalizePassword(text);
+
+  const containsRoot = offensiveRoots.some(word =>
+    cleaned.includes(word)
+  );
+
+  const hasBad = cleaned
+    ? filter.isProfane(cleaned)
+    : false;
+
+  const matches = bypassPatterns.some(pattern =>
+    pattern.test(cleaned)
+  );
+
+  return hasBad || containsRoot || matches;
+};
+const cleanedPassword = normalizePassword(password);
+const offensiveRoots = [
+  'fuck', 'fck', 'fk', 'fak',
+  'shit', 'bitch','gay'
+];
+
+const containsOffensiveRoot = offensiveRoots.some(word =>
+  cleanedPassword.includes(word)
+);
+// basic filter
+const hasBadWord = cleanedPassword
+  ? filter.isProfane(cleanedPassword)
+  : false;
+
+// 🔥 EXTRA: catch bypass patterns
+const bypassPatterns = [
+  /f+u*c*k+/,
+  /f+c*k+/,
+  /f+x+c*k+/,
+  /f+k+/,
+  /s+h+i+t+/,
+  /b+i+t+c+h+/
+];
+
+const matchesBypass = bypassPatterns.some((pattern) =>
+  pattern.test(cleanedPassword)
+);
+
+const isOffensive = hasBadWord || matchesBypass || containsOffensiveRoot;
   const shakeAnim = useState(new Animated.Value(0))[0];
 
   const hasTypedConfirm = confirmPassword.length > 0;
@@ -42,21 +106,25 @@ export default function RegisterScreen() {
     : isMismatch
     ? '#ef4444'
     : '#8B7CFF';
-
+const isNameOffensive = checkOffensive(fullName);
+const isEmailOffensive = checkOffensive(email);
+  // ✅ UPDATED VALIDATION
   const isPasswordValid =
     password.length >= 8 &&
     /[a-zA-Z]/.test(password) &&
-    /\d/.test(password);
-
-  const isFormValid =
-    fullName.trim().length > 0 &&
-    email.trim().length > 0 &&
-    isPasswordValid &&
-    confirmPassword.length > 0 &&
-    isMatch;
+    /\d/.test(password) &&
+    !isCommonPassword &&
+!isOffensive
+const isFormValid =
+  fullName.trim().length > 0 &&
+  email.trim().length > 0 &&
+  isPasswordValid &&
+  confirmPassword.length > 0 &&
+  isMatch &&
+  !isNameOffensive &&
+  !isEmailOffensive;
 
   const { language, setLanguage, t } = useLanguage();
-  const [modalVisible, setModalVisible] = useState(false);
 
   const scrollTo = (y: number) => {
     scrollRef.current?.scrollTo({ y, animated: true });
@@ -71,6 +139,7 @@ export default function RegisterScreen() {
       Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
     ]).start();
   };
+
 
   const STAR_COLORS = [
   '#ffffff',
@@ -262,8 +331,10 @@ React.useEffect(() => {
             contentContainerStyle={{ flexGrow: 1, paddingTop: 60, paddingBottom: 40 }}
             keyboardShouldPersistTaps="handled"
           >
-
-            <TouchableOpacity style={styles.langContainer} onPress={() => setModalVisible(true)}>
+   <TouchableOpacity
+              style={styles.langContainer}
+onPress={() => router.push('/language')}
+            >
               <Image source={require('../assets/images/globe.png')} style={styles.langIcon} />
               <Text style={[styles.langText, { fontSize: FONT }]}>{language}</Text>
               <Text style={styles.langArrow}>▼</Text>
@@ -272,15 +343,89 @@ React.useEffect(() => {
             <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
 
             <View style={styles.content}>
-              <AuthInput label={t.fullName} image={require('../assets/images/User.png')} placeholder="Enter your full name" value={fullName} onChangeText={setFullName} />
-              <AuthInput label={t.email} image={require('../assets/images/Letter.png')} placeholder="Enter your email" value={email} onChangeText={setEmail} />
-              <AuthInput label={t.password} image={require('../assets/images/Lock.png')} placeholder="Create a password" isPassword value={password} onChangeText={setPassword} onFocus={() => scrollTo(100)} borderColor={borderColor} />
 
-              <PasswordChecklist password={password} />
-              <PasswordStrength password={password} labelEmpty={t.PS} />
+{/* FULL NAME */}
+<AuthInput
+  label={t.fullName}
+  image={require('../assets/images/User.png')}
+placeholder={t.placeholderName}
+  value={fullName}
+  onChangeText={setFullName}
+/>
 
+{isNameOffensive && (
+  <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 4, marginBottom: 9, marginTop: -2 }}>
+    <Image
+      source={require('../assets/images/warning.png')}
+      style={{ width: 16, height: 16, marginRight: 7 }}
+    />
+    <Text style={{
+      color: '#ef4444',
+      fontSize: 11,
+      fontFamily: 'LEMONMILK',
+      backgroundColor: 'rgba(0,0,0,0.9)'
+    }}>
+{t.warningName}
+    </Text>
+  </View>
+)}
+              <AuthInput label={t.email} image={require('../assets/images/Letter.png')}placeholder={t.placeholderEmail} value={email} onChangeText={setEmail} />
+              {isEmailOffensive && (
+ <View style={{ flexDirection: 'row', alignItems: 'center',marginLeft: 4,marginBottom:9,marginTop:-2 }}>
+  <Image
+    source={require('../assets/images/warning.png')}
+    style={{ width: 16, height: 16, marginRight: 7 }}
+  />
+  <Text style={{
+    color: '#ef4444',
+    fontSize: 11,
+    fontFamily: 'LEMONMILK',
+    backgroundColor: 'rgba(0,0,0,0.9)'
+  }}>
+{t.warningEmail}
+  </Text>
+</View>
+)}
+              <AuthInput label={t.password} image={require('../assets/images/Lock.png')} placeholder={t.placeholderPassword} isPassword value={password} onChangeText={setPassword} onFocus={() => scrollTo(100)} borderColor={borderColor} />
+
+<PasswordChecklist password={password} t={t} />
+<PasswordStrength password={password} labelEmpty={t.PS} t={t} />
+{/* PASSWORD WARNINGS */}
+
+{isCommonPassword && (
+  <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 4, marginTop: 4 }}>
+    <Image
+      source={require('../assets/images/warning.png')}
+      style={{ width: 16, height: 16, marginRight: 7 }}
+    />
+    <Text style={{
+      color: '#ef4444',
+      fontSize: 11,
+      fontFamily: 'LEMONMILK',
+      backgroundColor: 'rgba(0,0,0,0.9)'
+    }}>
+      Avoid common passwords
+    </Text>
+  </View>
+)}
+
+{isOffensive && (
+  <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 4, marginTop: 4,marginBottom:9, }}>
+    <Image
+      source={require('../assets/images/warning.png')}
+      style={{ width: 16, height: 16, marginRight: 7 }}
+    />
+    <Text style={{
+      color: '#ef4444',
+      fontSize: 11,
+      fontFamily: 'LEMONMILK',
+      backgroundColor: 'rgba(0,0,0,0.9)'
+    }}>
+{t.warningOffensive}    </Text>
+  </View>
+)}
               <View ref={confirmRef}>
-                <AuthInput label={t.confirmPassword} image={require('../assets/images/Lock.png')} placeholder="Confirm your password" isPassword value={confirmPassword} onChangeText={(text) => {
+                <AuthInput label={t.confirmPassword} image={require('../assets/images/Lock.png')} placeholder={t.placeholderConfirm}isPassword value={confirmPassword} onChangeText={(text) => {
                   setConfirmPassword(text);
                   if (text.length > 0 && text !== password) triggerShake();
                 }} onFocus={() => scrollTo(260)} borderColor={borderColor} />
@@ -310,6 +455,7 @@ React.useEffect(() => {
 
           </ScrollView>
         </KeyboardAvoidingView>
+          
       </View>
     </TouchableWithoutFeedback>
   );
@@ -328,10 +474,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.9)', borderRadius: 20, borderWidth: 1.5,
     borderColor: '#899AF7', shadowColor: '#899AF7', shadowOpacity: 0.6, shadowRadius: 6, elevation: 5
   },
+    optionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1
+  },
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center' },
+
+  modalContent: { padding: 25 },
+
   langIcon: { width: 19, height: 19, marginRight: 8 },
   langText: { color: '#E6E6FA', marginRight: 8 },
   langArrow: { fontSize: 10, color: '#899AF7' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { padding: 25 },
+    flag: {
+    fontSize: 18
+  },
   optionText: { color: 'white', textAlign: 'center', padding: 15, fontFamily: 'Wix' },
 });
