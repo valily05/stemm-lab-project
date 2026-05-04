@@ -20,38 +20,18 @@ import { useLanguage } from '../context/LanguageContext';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const FONT = LAYOUT.width * 0.035;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { language, setLanguage, t } = useLanguage();
+  const { language, t } = useLanguage();
 
-  // ⭐ SAME STAR SYSTEM (copied from your register)
-  const STAR_COLORS = ['#ffffff','#60A5FA','#FACC15','#FB923C'];
-  const SPECIAL_COLORS = ['#C084FC','#F472B6','#A78BFA'];
-
-  const staticStars = useRef(
-    Array.from({ length: 30 }).map(() => {
-      const isSpecial = Math.random() > 0.6;
-      return {
-        x: Math.random() * LAYOUT.width,
-        y: Math.random() * LAYOUT.height,
-        size: isSpecial ? Math.random() * 3 + 2.5 : Math.random() * 2 + 1.5,
-        opacity: isSpecial ? 1 : Math.random() * 0.8 + 0.3,
-        color: isSpecial
-          ? SPECIAL_COLORS[Math.floor(Math.random()*SPECIAL_COLORS.length)]
-          : STAR_COLORS[Math.floor(Math.random()*STAR_COLORS.length)],
-        isSparkle: Math.random() > 0.7,
-      };
-    })
-  ).current;
-
+  // ⭐ STAR BACKGROUND (same as signup)
   const stars = useRef(
-    Array.from({ length: 80 }).map(() => ({
+    Array.from({ length: 60 }).map(() => ({
       x: Math.random() * LAYOUT.width,
       y: Math.random() * LAYOUT.height,
-      size: Math.random() * 1.5 + 0.5,
+      size: Math.random() * 2 + 1,
       opacity: new Animated.Value(Math.random()),
     }))
   ).current;
@@ -61,7 +41,7 @@ export default function LoginScreen() {
       Animated.loop(
         Animated.sequence([
           Animated.timing(star.opacity, {
-            toValue: 0.7,
+            toValue: 0.8,
             duration: 2000,
             useNativeDriver: true,
           }),
@@ -81,47 +61,21 @@ export default function LoginScreen() {
 
         {/* ⭐ BACKGROUND */}
         <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-
-          {staticStars.map((star, i) => (
-            <View key={i} style={{
-              position:'absolute',
-              left:star.x,
-              top:star.y,
-              width:star.size,
-              height:star.size,
-              alignItems:'center',
-              justifyContent:'center',
-              opacity:star.opacity
-            }}>
-              {star.isSparkle ? (
-                <>
-                  <View style={{width:2,height:star.size*2,backgroundColor:star.color}}/>
-                  <View style={{width:star.size*2,height:2,backgroundColor:star.color}}/>
-                </>
-              ) : (
-                <View style={{
-                  width:star.size,
-                  height:star.size,
-                  borderRadius:50,
-                  backgroundColor:star.color
-                }}/>
-              )}
-            </View>
+          {stars.map((star, i) => (
+            <Animated.View
+              key={i}
+              style={{
+                position: 'absolute',
+                left: star.x,
+                top: star.y,
+                width: star.size,
+                height: star.size,
+                borderRadius: 50,
+                backgroundColor: '#fff',
+                opacity: star.opacity,
+              }}
+            />
           ))}
-
-          {stars.map((star,i)=>(
-            <Animated.View key={i} style={{
-              position:'absolute',
-              left:star.x,
-              top:star.y,
-              width:star.size,
-              height:star.size,
-              borderRadius:50,
-              backgroundColor:'#fff',
-              opacity:star.opacity
-            }}/>
-          ))}
-
         </View>
 
         {/* UI */}
@@ -129,73 +83,85 @@ export default function LoginScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
         >
-          <ScrollView contentContainerStyle={{ paddingTop:60,paddingBottom:40 }}>
+          <ScrollView contentContainerStyle={{ paddingTop: 60, paddingBottom: 40 }}>
 
-            {/* 🌐 Language */}
+            {/* 🌐 LANGUAGE */}
             <TouchableOpacity style={styles.langContainer}>
               <Image source={require('../assets/images/globe.png')} style={styles.langIcon}/>
               <Text style={styles.langText}>{language}</Text>
+                <Text style={styles.langArrow}>▼</Text>
             </TouchableOpacity>
 
-            {/* 🎮 Logo */}
-            <Image source={require('../assets/images/logo.png')} style={styles.logo}/>
+            <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
 
-            <Text style={styles.title}>WELCOME BACK !</Text>
-            <Text style={styles.subtitle}>LOGIN TO CONTINUE YOUR MISSION</Text>
+            {/* 🔤 TITLE */}
+            <Text style={styles.title}>{t.loginTitle || "WELCOME BACK !"}</Text>
+            <Text style={styles.subtitle}>{t.loginSubtitle || "LOGIN TO CONTINUE YOUR MISSION"}</Text>
 
             <View style={styles.content}>
 
+              {/* 📧 EMAIL */}
               <AuthInput
-                label="EMAIL ADDRESS"
+                label={t.email}
                 image={require('../assets/images/Letter.png')}
-                placeholder="Enter your email"
+                placeholder={t.enterEmail || "Enter your email"}
                 value={email}
                 onChangeText={setEmail}
               />
 
+              {/* 🔒 PASSWORD */}
               <AuthInput
-                label="PASSWORD"
+                label={t.password}
                 image={require('../assets/images/Lock.png')}
-                placeholder="Enter your password"
+                placeholder={t.enterPassword || "Enter your password"}
                 isPassword
                 value={password}
                 onChangeText={setPassword}
               />
-   {/* 🔵 Forgot + Line */}
-              <View style={styles.forgotContainer}>
-  <TouchableOpacity>
-    <Text style={styles.forgot}>FORGOT PASSWORD?</Text>
-  </TouchableOpacity>
 
-  <View style={styles.topLine} />
-</View>
-              <AuthButton title="LOGIN" onPress={()=>{}}/>
+              {/* 🔵 FORGOT */}
+              <View style={styles.forgotContainer}>
+                <TouchableOpacity>
+                  <Text style={styles.forgot}>
+                    {t.forgot || "FORGOT PASSWORD?"}
+                  </Text>
+                </TouchableOpacity>
+                <View style={styles.topLine} />
+              </View>
+
+              {/* 🔘 LOGIN BUTTON */}
+              <AuthButton title={t.login || "LOGIN"} onPress={() => {}}/>
 
               <Text style={styles.or}>OR</Text>
 
-<TouchableOpacity style={styles.googleBtn} activeOpacity={0.8}>
-    <View style={styles.googleContent}>
-    <Image
-      source={require('../assets/images/google.png')}
-      style={styles.googleIcon}
-    />
-    <Text style={styles.googleText}>Login with Google</Text>
-  </View>
-</TouchableOpacity>
-
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>Don't have an account?</Text>
-                <TouchableOpacity onPress={()=>router.push('/signup')}>
-  <View style={{ alignItems: 'center' }}>
-    <Text style={styles.register}>REGISTER NOW →</Text>
-    <View style={styles.registerUnderline} />
-  </View>
-</TouchableOpacity>
-              </View>
-
-              <TouchableOpacity style={styles.teacher}>
-                <Text style={{color:'white'}}>TEACHER / ADMIN LOGIN</Text>
+              {/* 🔵 GOOGLE */}
+              <TouchableOpacity style={styles.googleBtn} activeOpacity={0.8}>
+                <View style={styles.googleContent}>
+                  <Image
+                    source={require('../assets/images/google.png')}
+                    style={styles.googleIcon}
+                  />
+                  <Text style={styles.googleText}>
+                    {t.googleLogin || "Login with Google"}
+                  </Text>
+                </View>
               </TouchableOpacity>
+
+              {/* 🔗 REGISTER */}
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>
+                  {t.noAccount || "Don't have an account?"}
+                </Text>
+
+                <TouchableOpacity onPress={() => router.push('/signup')}>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={styles.register}>
+                      {t.registerNow || "REGISTER NOW →"}
+                    </Text>
+                    <View style={styles.registerUnderline}/>
+                  </View>
+                </TouchableOpacity>
+              </View>
 
             </View>
 
@@ -208,100 +174,110 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-logo:{
-  width: LAYOUT.width * 0.95,
-  height: 100,
-  alignSelf: 'center',
-  resizeMode: 'contain',
-  marginBottom: 8,
-  marginTop:20,
-},  content:{paddingHorizontal:20},
-  title:{color:'white',textAlign:'center',fontFamily:'Pixel',fontSize:18},
-  subtitle:{color:'#FACC15',textAlign:'center',marginBottom:20,fontFamily:'Pixel',fontSize:11,marginTop:13,},
-/* 🔵 FORGOT */
-forgotContainer:{
-  alignSelf:'flex-start',
-  marginBottom:15,
-    backgroundColor:'rgba(0,0,0,0.9)',
+  logo: { width: LAYOUT.width * 0.9, height: 120, alignSelf: 'center', marginTop: LAYOUT.height * 0.03 },
 
-},
 
-forgot:{
-  color:'#60A5FA',
-  fontFamily:'Pixel',
-  fontSize:10,
-},
+  content:{ paddingHorizontal:20 },
 
-registerUnderline: {
-  height: 2,
-  backgroundColor: '#FACC15', 
-  width: '100%',
-  marginTop: 3,
-  opacity: 1,
-},
-
-topLine:{
-  width:160,
-  height:2,
-  backgroundColor:'#60A5FA',
-  marginTop:6,
-  borderRadius:2,
-
-  shadowColor:'#60A5FA',
-  shadowOpacity:0.8,
-  shadowRadius:6,
-},
-or:{
-  color:'white',
-  textAlign:'center',
-  marginTop: 18,
-  marginBottom: 8,
-  
-},  footer:{alignItems:'center',marginTop:20},
-  footerText:{color:'white',fontFamily:'Pixel'},
-register:{
-  color:'yellow',
-  marginTop:5,
-  fontFamily:'Pixel',
-},  teacher:{marginTop:30,padding:15,borderWidth:1,borderColor:'#8B7CFF',borderRadius:20,alignItems:'center',fontFamily:'Pixel'},
-
-  langContainer:{
-    position:'absolute',top:60,right:20,flexDirection:'row',
-    backgroundColor:'rgba(0,0,0,0.9)',padding:8,borderRadius:20
+  title:{
+    color:'white',
+    textAlign:'center',
+    fontFamily:'Pixel',
+    fontSize:18
   },
-  langIcon:{width:18,height:18,marginRight:6},
-  langText:{color:'#E6E6FA'},
-googleBtn: {
-  marginTop: 15,
-  borderRadius: 30,
-  paddingVertical: 16,
-  alignItems: 'center',
-  justifyContent: 'center',
+  langArrow: { fontSize: 10, color: '#899AF7' },
 
-  backgroundColor: 'rgba(255,255,255,0.12)', // ⭐ glass
-  borderWidth: 1.2,
-  borderColor: 'rgba(255,255,255,0.25)',
+  subtitle:{
+    color:'#FACC15',
+    textAlign:'center',
+    marginBottom:20,
+    fontFamily:'Pixel',
+    fontSize:11,
+    marginTop:13,
+  },
 
-  shadowColor: '#fff',
-  shadowOpacity: 0.1,
-  shadowRadius: 6,
-},
+  forgotContainer:{
+    alignSelf:'flex-start',
+    marginBottom:15,
+  },
 
-googleContent: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-},
+  forgot:{
+    color:'#60A5FA',
+    fontFamily:'Pixel',
+    fontSize:10,
+  },
 
-googleIcon: {
-  width: 20,
-  height: 20,
-  marginRight: 12, // better spacing from text
-},
+  topLine:{
+    width:160,
+    height:2,
+    backgroundColor:'#60A5FA',
+    marginTop:6,
+    borderRadius:2,
+  },
 
-googleText: {
-  color: '#ffffff', 
-  fontSize: 15,
-  letterSpacing: 0.5,
-},
+  or:{
+    color:'white',
+    textAlign:'center',
+    marginTop:18,
+    marginBottom:8,
+  },
+
+  footer:{
+    alignItems:'center',
+    marginTop:20
+  },
+
+  footerText:{
+    color:'white',
+    fontFamily:'Pixel'
+  },
+
+  register:{
+    color:'yellow',
+    marginTop:10,
+    fontFamily:'Pixel',
+  },
+
+  registerUnderline:{
+    height:2,
+    backgroundColor:'#FACC15',
+    width:'100%',
+    marginTop:3,
+  },
+
+ langContainer: {
+    position: 'absolute', top: LAYOUT.height * 0.08, right: LAYOUT.width * 0.05,
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8,
+    backgroundColor: 'rgba(0,0,0,0.9)', borderRadius: 20, borderWidth: 1.5,
+    borderColor: '#899AF7', shadowColor: '#899AF7', shadowOpacity: 0.6, shadowRadius: 6, elevation: 5
+  },
+  langIcon:{ width:18, height:18, marginRight:6 },
+
+  langText: { color: '#E6E6FA', marginRight: 8 },
+
+  googleBtn:{
+    marginTop:15,
+    borderRadius:30,
+    paddingVertical:16,
+    alignItems:'center',
+    backgroundColor:'rgba(255,255,255,0.12)',
+    borderWidth:1.2,
+    borderColor:'rgba(255,255,255,0.25)',
+  },
+
+  googleContent:{
+    flexDirection:'row',
+    alignItems:'center',
+  },
+
+  googleIcon:{
+    width:20,
+    height:20,
+    marginRight:12,
+  },
+
+  googleText:{
+    color:'#ffffff',
+    fontSize:15,
+  },
 });

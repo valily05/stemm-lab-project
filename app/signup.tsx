@@ -369,7 +369,8 @@ placeholder={t.placeholderName}
     </Text>
   </View>
 )}
-              <AuthInput label={t.email} image={require('../assets/images/Letter.png')}placeholder={t.placeholderEmail} value={email} onChangeText={setEmail} />
+              <AuthInput label={t.email} 
+              image={require('../assets/images/Letter.png')}placeholder={t.placeholderEmail} value={email} onChangeText={setEmail} />
               {isEmailOffensive && (
  <View style={{ flexDirection: 'row', alignItems: 'center',marginLeft: 4,marginBottom:9,marginTop:-2 }}>
   <Image

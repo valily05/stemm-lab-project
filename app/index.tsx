@@ -36,7 +36,7 @@ export default function LoadingScreen() {
 
     const navTimer = setTimeout(() => {
       router.replace('/signup');
-    }, 2000);
+    }, 6800);
 
     return () => {
       clearInterval(dotInterval);

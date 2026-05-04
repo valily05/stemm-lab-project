@@ -1,7 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
   Image,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,17 +11,51 @@ import {
 
 export default function HomeScreen() {
 
-  const activities = [
-    { title: 'EARTHQUAKE\nRESISTANT\nSTRUCTURE', icon: require('../../assets/images/building.png') },
-    { title: 'PARACHUTE\nDROP\nCHALLENGE', icon: require('../../assets/images/parachute.png') },
-    { title: 'REACTION\nBOARD\nLAB', icon: require('../../assets/images/lightning.png') },
-    { title: 'HUMAN\nPERFORMANCE\nLAB', icon: require('../../assets/images/human.png') },
-    { title: 'HAND FAN\nCHALLENGE', icon: require('../../assets/images/fan.png') },
-    { title: 'SOUND\nPOLLUTION\nHUNTER', icon: require('../../assets/images/sound.png') },
-  ];
+const activities = [
+  {
+    title: 'EARTHQUAKE\nRESISTANT\nSTRUCTURE',
+    icon: require('../../assets/images/building.png'),
+    tag: 'Engineering',
+    iconStyle: { width: 29, height: 30 }
+  },
+  {
+    title: 'PARACHUTE\nDROP\nCHALLENGE',
+    icon: require('../../assets/images/parachute.png'),
+    tag: 'Science',
+    iconStyle: { width: 30, height: 30 }
+  },
+  {
+    title: 'REACTION\nBOARD\nLAB',
+    icon: require('../../assets/images/lightning.png'),
+    tag: 'Science',
+    iconStyle: { width: 28, height: 28 }
+  },
+  {
+    title: 'HUMAN\nPERFORMANCE\nLAB',
+    icon: require('../../assets/images/human.png'),
+    tag: 'Science',
+    iconStyle: { width: 33, height: 33 }
+  },
+  {
+    title: 'HAND\nFAN\nCHALLENGE',
+    icon: require('../../assets/images/fan.png'),
+    tag: 'Engineering',
+    iconStyle: { width: 40, height: 29 }
+  },
+  {
+    title: 'SOUND\nPOLLUTION\nHUNTER',
+    icon: require('../../assets/images/sound.png'),
+    tag: 'Science',
+    iconStyle: { width: 30, height: 30 }
+  },
+];
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require('../../assets/images/space.png')}
+      style={styles.container}
+      resizeMode="cover"
+    >
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
 
         {/* HEADER */}
@@ -32,14 +66,11 @@ export default function HomeScreen() {
         </View>
 
         {/* WELCOME */}
-        <LinearGradient
-          colors={['#6D28D9', '#4C1D95']}
-          style={styles.welcomeCard}
-        >
+        <View style={styles.welcomeCard}>
           <Text style={styles.welcomeText}>
             WELCOME BACK VALENCIA
           </Text>
-        </LinearGradient>
+        </View>
 
         {/* TITLE */}
         <Text style={styles.section}>AVAILABLE ACTIVITIES</Text>
@@ -49,18 +80,28 @@ export default function HomeScreen() {
           {activities.map((item, index) => (
             <TouchableOpacity key={index} activeOpacity={0.85} style={styles.cardWrapper}>
               <View style={styles.card}>
-                <Image source={item.icon} style={styles.cardIcon} />
-                <Text style={styles.cardText}>{item.title}</Text>
+
+                {/* TOP ROW */}
+                <View style={styles.cardRow}>
+                  <Image
+                    source={item.icon}
+                    style={[styles.cardIcon, item.iconStyle]}
+                  />
+                  <Text style={styles.cardText}>{item.title}</Text>
+                </View>
+
+                {/* TAG */}
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>{item.tag}</Text>
+                </View>
+
               </View>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* CTA */}
-        <LinearGradient
-          colors={['#FACC15', '#F59E0B']}
-          style={styles.cta}
-        >
+        {/* CTA (PASTEL YELLOW) */}
+        <View style={styles.cta}>
           <Image source={require('../../assets/images/trophy.png')} style={styles.ctaIcon} />
           <View>
             <Text style={styles.ctaTitle}>KEEP EXPLORING!</Text>
@@ -68,39 +109,54 @@ export default function HomeScreen() {
               Complete activities, earn badges and level up your team!
             </Text>
           </View>
-        </LinearGradient>
+        </View>
 
       </ScrollView>
 
       {/* NAVBAR */}
       <View style={styles.navbar}>
-        <NavItem icon={require('../../assets/images/home1.png')} label="HOME" active />
-        <NavItem icon={require('../../assets/images/rocket.png')} label="ACTIVITIES" />
-        <NavItem icon={require('../../assets/images/leaderboard.png')} label="LEADERBOARD" />
+        <NavItem
+          icon={require('../../assets/images/home1.png')}
+          label="HOME"
+          active
+          imageStyle={styles.homeIcon}
+        />
+        <NavItem
+          icon={require('../../assets/images/rocket.png')}
+          label="ACTIVITIES"
+          imageStyle={styles.rocketIcon}
+        />
+        <NavItem
+          icon={require('../../assets/images/leaderboard.png')}
+          label="LEADERBOARD"
+          imageStyle={styles.leaderboardIcon}
+        />
       </View>
-    </View>
+
+    </ImageBackground>
   );
 }
 
-const NavItem = ({ icon, label, active = false }: any) => (
-  <TouchableOpacity style={styles.navItem}>
+const NavItem = ({ icon, label, active = false, imageStyle }: any) => (
+  <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
+    
     <Image
       source={icon}
-      style={[
-        styles.navIcon,
-        active && { tintColor: '#FACC15' }
-      ]}
+      style={[styles.navImage, imageStyle]}
+      resizeMode="contain"
     />
-    <Text style={[styles.navText, active && { color: '#FACC15' }]}>
+
+    <Text style={[styles.navText, active && styles.activeText]}>
       {label}
     </Text>
+
+    {active && <View style={styles.activeLine} />}
   </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617',
     paddingHorizontal: 16,
   },
 
@@ -108,7 +164,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 60, // safer spacing
+    marginTop: 60,
   },
 
   icon: {
@@ -127,10 +183,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 18,
     padding: 16,
-    shadowColor: '#8B5CF6',
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 8,
+    backgroundColor: 'rgba(109,40,217,0.8)',
   },
 
   welcomeText: {
@@ -140,7 +193,14 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
 
-   section: {
+  activeLine: {
+    marginTop: 7,
+    width: 40,
+    height: 2,
+    backgroundColor: '#FACC15',
+  },
+
+  section: {
     marginTop: 20,
     color: '#9CA3AF',
     fontFamily: 'Pixel',
@@ -159,28 +219,53 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
 
-  card: {
-    backgroundColor: '#1E293B',
-    borderRadius: 18,
-    padding: 16,
-    height: 130,
-    justifyContent: 'space-between',
-
-    shadowColor: '#000',
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 5,
+  cardRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
 
   cardIcon: {
-    width: 34,
-    height: 34,
+    marginRight: 10,
+    marginTop: 4,
   },
 
   cardText: {
     color: '#fff',
     fontFamily: 'Pixel',
     fontSize: 11,
+    flex: 1,
+    lineHeight: 18,
+  },
+
+  tag: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: 'rgba(250,204,21,0.2)',
+    borderWidth: 1,
+    borderColor: '#FACC15',
+  },
+
+  tagText: {
+    color: '#FACC15',
+    fontSize: 10,
+    fontFamily: 'Pixel',
+  },
+
+  card: {
+    backgroundColor: 'rgba(30,41,59,0.7)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 18,
+    padding: 16,
+    height: 130,
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 5,
   },
 
   cta: {
@@ -189,12 +274,19 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 6,
+backgroundColor: 'rgba(254, 243, 199, 0.8)',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    shadowColor: '#FACC15',
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 4,
   },
 
   ctaIcon: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 45,
     marginRight: 12,
   },
 
@@ -206,33 +298,45 @@ const styles = StyleSheet.create({
 
   ctaText: {
     fontSize: 10,
-    color: '#000'
+    color: '#000',
+    fontFamily:'pixeljosh6',
+    marginTop:4,
   },
 
   navbar: {
     position: 'absolute',
     bottom: 0,
-    width: '100%',
+    left: 0,
+    right: 0,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 14,
-    backgroundColor: '#020617',
-    borderTopWidth: 1,
-    borderTopColor: '#1E293B',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    paddingVertical: 16,
+    backgroundColor: 'rgba(2,6,23,0.95)',
   },
 
   navItem: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
-  navIcon: {
-    width: 24,
-    height: 24,
-    tintColor: '#64748B'
+  navImage: {
+    marginBottom: 4,
   },
 
   navText: {
     fontSize: 10,
-    color: '#64748B'
-  }
+    color: '#64748B',
+    fontFamily: 'Pixel'
+  },
+
+  activeText: {
+    color: '#FACC15',
+    textShadowColor: '#FACC15',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
+  },
+
+  homeIcon: { width: 34, height: 34 },
+  rocketIcon: { width: 34, height: 34 },
+  leaderboardIcon: { width: 34, height: 34 },
 });
