@@ -241,7 +241,7 @@ return () => clearInterval(interval);
       />
     ))}
 
-    {/* 🟩 SIDE WHITE BLOCKS */}
+    {/* SIDE WHITE BLOCKS */}
     {[
       { top: 0, left: -UNIT },
       { top: 0, right: -UNIT },
@@ -261,7 +261,7 @@ return () => clearInterval(interval);
       />
     ))}
 
-    {/* 🟩 INNER GREEN PIXEL */}
+    {/* INNER GREEN PIXEL */}
     <View style={{
       position: 'absolute',
       top: UNIT * 1.3,
@@ -272,7 +272,7 @@ return () => clearInterval(interval);
       zIndex: 11,
     }} />
 
-    {/* 🟩 OUTER GREEN EDGES */}
+    {/*  OUTER GREEN EDGES */}
     {[
       { top: 0, left: -UNIT * 2 },
       { top: 0, right: -UNIT * 2 },
@@ -292,7 +292,7 @@ return () => clearInterval(interval);
       />
     ))}
 
-    {/* 🟩 SECOND LAYER WHITE */}
+    {/*  SECOND LAYER WHITE */}
     {[
       { top: UNIT, left: -UNIT * 2 },
       { top: UNIT, right: -UNIT * 2 },
@@ -312,7 +312,7 @@ return () => clearInterval(interval);
       />
     ))}
 
-    {/* 🟩 OUTER GREEN FINAL */}
+    {/*  OUTER GREEN FINAL */}
     {[
       { top: UNIT, left: -UNIT * 3 },
       { top: UNIT, right: -UNIT * 3 },
