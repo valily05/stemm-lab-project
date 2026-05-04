@@ -59,7 +59,7 @@ export default function LoginScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{ flex: 1, backgroundColor: '#020617' }}>
 
-        {/* ⭐ BACKGROUND */}
+        {/*  BACKGROUND */}
         <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
           {stars.map((star, i) => (
             <Animated.View
@@ -78,14 +78,13 @@ export default function LoginScreen() {
           ))}
         </View>
 
-        {/* UI */}
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
         >
           <ScrollView contentContainerStyle={{ paddingTop: 60, paddingBottom: 40 }}>
 
-            {/* 🌐 LANGUAGE */}
+            {/* LANGUAGE */}
             <TouchableOpacity style={styles.langContainer}>
               <Image source={require('../assets/images/globe.png')} style={styles.langIcon}/>
               <Text style={styles.langText}>{language}</Text>
@@ -94,13 +93,13 @@ export default function LoginScreen() {
 
             <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
 
-            {/* 🔤 TITLE */}
+            {/*  TITLE */}
             <Text style={styles.title}>{t.loginTitle || "WELCOME BACK !"}</Text>
             <Text style={styles.subtitle}>{t.loginSubtitle || "LOGIN TO CONTINUE YOUR MISSION"}</Text>
 
             <View style={styles.content}>
 
-              {/* 📧 EMAIL */}
+              {/*  EMAIL */}
               <AuthInput
                 label={t.email}
                 image={require('../assets/images/Letter.png')}
@@ -109,7 +108,7 @@ export default function LoginScreen() {
                 onChangeText={setEmail}
               />
 
-              {/* 🔒 PASSWORD */}
+              {/*  PASSWORD */}
               <AuthInput
                 label={t.password}
                 image={require('../assets/images/Lock.png')}
@@ -119,7 +118,7 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
               />
 
-              {/* 🔵 FORGOT */}
+              {/*  FORGOT */}
               <View style={styles.forgotContainer}>
                 <TouchableOpacity>
                   <Text style={styles.forgot}>
@@ -129,12 +128,12 @@ export default function LoginScreen() {
                 <View style={styles.topLine} />
               </View>
 
-              {/* 🔘 LOGIN BUTTON */}
+              {/*  LOGIN BUTTON */}
               <AuthButton title={t.login || "LOGIN"} onPress={() => {}}/>
 
               <Text style={styles.or}>OR</Text>
 
-              {/* 🔵 GOOGLE */}
+              {/*  GOOGLE */}
               <TouchableOpacity style={styles.googleBtn} activeOpacity={0.8}>
                 <View style={styles.googleContent}>
                   <Image
@@ -147,7 +146,7 @@ export default function LoginScreen() {
                 </View>
               </TouchableOpacity>
 
-              {/* 🔗 REGISTER */}
+              {/*  REGISTER */}
               <View style={styles.footer}>
                 <Text style={styles.footerText}>
                   {t.noAccount || "Don't have an account?"}
