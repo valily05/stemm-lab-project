@@ -13,42 +13,69 @@ export default function HomeScreen() {
 
 const activities = [
   {
-    title: 'EARTHQUAKE\nRESISTANT\nSTRUCTURE',
+    title: 'EARTHQUAKE RESISTANT STRUCTURE',
     icon: require('../../assets/images/building.png'),
-    tag: 'Engineering',
+    tags: ['Engineering', 'Environmental'],
     iconStyle: { width: 29, height: 30 }
   },
   {
-    title: 'PARACHUTE\nDROP\nCHALLENGE',
+    title: 'PARACHUTE DROP CHALLENGE',
     icon: require('../../assets/images/parachute.png'),
-    tag: 'Science',
+    tags: ['Physics', 'Engineering'],
     iconStyle: { width: 30, height: 30 }
   },
   {
-    title: 'REACTION\nBOARD\nLAB',
+    title: 'REACTION BOARD LAB',
     icon: require('../../assets/images/lightning.png'),
-    tag: 'Science',
+    tags: ['Neuroscience','Physics'],
     iconStyle: { width: 28, height: 28 }
   },
   {
-    title: 'HUMAN\nPERFORMANCE\nLAB',
+    title: 'HUMAN PERFORMANCE LAB',
     icon: require('../../assets/images/human.png'),
-    tag: 'Science',
-    iconStyle: { width: 33, height: 33 }
+    tags: ['Medical Science', 'Neuroscience'],
+    iconStyle: { width: 34, height: 33 }
   },
   {
-    title: 'HAND\nFAN\nCHALLENGE',
+    title: 'HAND FAN CHALLENGE',
     icon: require('../../assets/images/fan.png'),
-    tag: 'Engineering',
+    tags: ['Engineering', 'Physics'],
     iconStyle: { width: 40, height: 29 }
   },
   {
-    title: 'SOUND\nPOLLUTION\nHUNTER',
+    title: 'SOUND POLLUTION HUNTER',
     icon: require('../../assets/images/sound.png'),
-    tag: 'Science',
+    tags: ['Environmental', 'Physics'],
     iconStyle: { width: 30, height: 30 }
   },
 ];
+const TAG_COLORS: any = {
+  Engineering: {
+    bg: 'rgba(249,115,22,0.2)',
+    border: '#F97316',
+    text: '#FDBA74'
+  },
+  Physics: {
+    bg: 'rgba(59,130,246,0.2)',
+    border: '#3B82F6',
+    text: '#93C5FD'
+  },
+  Environmental: {
+    bg: 'rgba(34,197,94,0.2)',
+    border: '#22C55E',
+    text: '#86EFAC'
+  },
+  'Medical Science': {
+    bg: 'rgba(168,85,247,0.2)',
+    border: '#A855F7',
+    text: '#D8B4FE'
+  },
+  Neuroscience: {
+    bg: 'rgba(250,204,21,0.2)',
+    border: '#FACC15',
+    text: '#FDE68A'
+  }
+};
 
   return (
     <ImageBackground
@@ -60,7 +87,7 @@ const activities = [
 
         {/* HEADER */}
         <View style={styles.header}>
-          <Image source={require('../../assets/images/menu.png')} style={styles.icon} />
+          <Image source={require('../../assets/images/menu.png')} style={styles.menu} />
           <Text style={styles.logo}>STEMM LAB</Text>
           <Image source={require('../../assets/images/user1.png')} style={styles.icon} />
         </View>
@@ -73,9 +100,10 @@ const activities = [
         </View>
 
         {/* TITLE */}
-        <Text style={styles.section}>AVAILABLE ACTIVITIES</Text>
-
-        {/* GRID */}
+<Text style={styles.section}>
+  <Text style={styles.emoji}>🎯</Text> AVAILABLE ACTIVITIES
+</Text>
+  {/* GRID */}
         <View style={styles.grid}>
           {activities.map((item, index) => (
             <TouchableOpacity key={index} activeOpacity={0.85} style={styles.cardWrapper}>
@@ -90,10 +118,28 @@ const activities = [
                   <Text style={styles.cardText}>{item.title}</Text>
                 </View>
 
-                {/* TAG */}
-                <View style={styles.tag}>
-                  <Text style={styles.tagText}>{item.tag}</Text>
-                </View>
+             <View style={styles.tagContainer}>
+  {item.tags.map((tag: string, i: number) => {
+    const tagStyle = TAG_COLORS[tag] || TAG_COLORS.Engineering;
+
+    return (
+      <View
+        key={i}
+        style={[
+          styles.tag,
+          {
+            backgroundColor: tagStyle.bg,
+            borderColor: tagStyle.border,
+          }
+        ]}
+      >
+        <Text style={[styles.tagText, { color: tagStyle.text }]}>
+          {tag}
+        </Text>
+      </View>
+    );
+  })}
+</View>
 
               </View>
             </TouchableOpacity>
@@ -165,26 +211,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 60,
   },
+tagContainer: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: 2, 
+  marginTop: 8,
+},
+
 
   icon: {
-    width: 28,
-    height: 28,
+    width: 27,
+    height: 27,
     tintColor: '#fff'
   },
 
+  menu: {
+    width: 20,
+    height: 20,
+    tintColor: '#fff'
+  },
   logo: {
     color: '#fff',
     fontFamily: 'Pixel',
     fontSize: 22,
   },
-
-  welcomeCard: {
-    marginTop: 20,
-    borderRadius: 18,
-    padding: 16,
-    backgroundColor: 'rgba(109,40,217,0.8)',
-  },
-
+welcomeCard: {
+  marginTop: 30,
+  padding: 16,
+  backgroundColor: 'rgba(109,40,217,0.8)',
+  marginHorizontal: -16,
+},
+emoji: {
+  fontSize: 20, 
+},
   welcomeText: {
     color: '#fff',
     fontFamily: 'Pixel',
@@ -214,7 +273,7 @@ const styles = StyleSheet.create({
   },
 
   cardWrapper: {
-    width: '48%',
+    width: '49%',
     marginBottom: 14,
   },
 
@@ -228,13 +287,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  cardText: {
-    color: '#fff',
-    fontFamily: 'Pixel',
-    fontSize: 11,
-    flex: 1,
-    lineHeight: 18,
-  },
+cardText: {
+  color: '#fff',
+  fontFamily: 'Pixel',
+  fontSize: 9,
+  flex: 1,
+  lineHeight: 18,
+  flexWrap: 'wrap',     
+  minWidth:0, 
+},
 
   tag: {
     marginTop: 10,
@@ -249,8 +310,9 @@ const styles = StyleSheet.create({
 
   tagText: {
     color: '#FACC15',
-    fontSize: 10,
-    fontFamily: 'Pixel',
+    fontSize: 13,
+    fontFamily: 'PixelOperator',
+    padding:2,
   },
 
   card: {
@@ -259,7 +321,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.1)',
     borderRadius: 18,
     padding: 16,
-    height: 130,
+    height: 160,
     justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOpacity: 0.4,
@@ -273,7 +335,7 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-backgroundColor: 'rgba(254, 243, 199, 0.8)',
+    backgroundColor: 'rgba(254, 243, 199, 0.8)',
     borderWidth: 1,
     borderColor: '#FDE68A',
     shadowColor: '#FACC15',
@@ -284,9 +346,9 @@ backgroundColor: 'rgba(254, 243, 199, 0.8)',
   },
 
   ctaIcon: {
-    width: 50,
-    height: 45,
-    marginRight: 12,
+    width: 54,
+    height: 48,
+    marginRight: 14,
   },
 
   ctaTitle: {
@@ -296,27 +358,29 @@ backgroundColor: 'rgba(254, 243, 199, 0.8)',
   },
 
   ctaText: {
-    fontSize: 10,
+    fontSize: 15,
     color: '#000',
-    fontFamily:'pixeljosh6',
+    fontFamily:'PixelOperator',
     marginTop:4,
+    width:260,
   },
+navbar: {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
 
-  navbar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    paddingVertical: 16,
-    backgroundColor: 'rgba(2,6,23,0.95)',
-  },
+  flexDirection: 'row',
+  justifyContent: 'center', // 🔥 center everything
+  alignItems: 'center',
 
-  navItem: {
-    alignItems: 'center',
-  },
+  paddingVertical: 16,
+  backgroundColor: 'rgba(2,6,23,0.95)',
+},
+navItem: {
+  alignItems: 'center',
+  marginHorizontal: 20, // 🔥 controls spacing between icons
+},
 
   navImage: {
     marginBottom: 4,
